@@ -1,8 +1,18 @@
-from confluent_kafka import Producer
 import json
+from aiokafka import AIOKafkaProducer
 
-producer = Producer({"bootstrap.servers": "localhost:9092"})
+producer = None
 
-def emit_event(topic: str, payload: dict):
-    producer.produce(topic, key=payload.get("type", "content"), value=json.dumps(payload))
-    producer.flush()
+async def get_producer():
+    global producer
+    if not producer:
+        producer = AIOKafkaProducer(
+            bootstrap_servers="localhost:9092",
+            value_serializer=lambda m: json.dumps(m).encode("utf-8")
+        )
+        await producer.start()
+    return producer
+
+async def emit_event(topic: str, payload: dict):
+    producer = await get_producer()
+    await producer.send_and_wait(topic, value=payload)

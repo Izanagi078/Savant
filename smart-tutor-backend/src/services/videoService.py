@@ -1,10 +1,24 @@
-from typing import Dict, Optional
-from src.utils.chunksUtils import simple_token_chunk
+import aiohttp
+from bs4 import BeautifulSoup
 
-def build_video_meta(title: str, platform: str, video_id: str, url: Optional[str] = None) -> Dict:
-    if platform.lower() == "youtube":
-        url = url or f"https://www.youtube.com/watch?v={video_id}"
-    return {"type": "video", "title": title, "platform": platform, "video_id": video_id, "url": url}
+async def search_youtube(topic: str, level: str) -> list:
+    query = f"{level} {topic} tutorial site:youtube.com"
+    url = f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}"
 
-def chunk_video_transcript(transcript_text: str, max_chars: int = 1200, overlap: int = 150):
-    return simple_token_chunk(transcript_text or "", max_chars=max_chars, overlap=overlap)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            html = await resp.text()
+            soup = BeautifulSoup(html, "html.parser")
+            results = []
+
+            for link in soup.select("a[href^='/watch']")[:3]:
+                video_url = f"https://www.youtube.com{link['href']}"
+                title = link.get("title") or "YouTube Video"
+                results.append({
+                    "source": "YouTube",
+                    "title": title,
+                    "description": f"{topic} video for {level} learners",
+                    "url": video_url
+                })
+
+            return results
