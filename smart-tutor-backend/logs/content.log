@@ -1,0 +1,163 @@
+2025-12-18 13:15:38.401 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: ships, level: beginner
+2025-12-18 13:15:38.409 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: ships, level: beginner
+2025-12-18 13:15:39.853 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 13:15:39.855 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 13:15:40.459 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.6579
+2025-12-18 13:15:40.460 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 13:21:09.465 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Amaterasu, level: beginner
+2025-12-18 13:21:09.469 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Amaterasu, level: beginner
+2025-12-18 13:21:10.752 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 13:21:10.753 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 13:21:11.247 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.6968
+2025-12-18 13:21:11.247 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 14:02:32.384 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: cricket, level: beginner
+2025-12-18 14:02:32.399 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: cricket, level: beginner
+2025-12-18 14:02:34.998 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 14:02:35.000 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 14:02:35.688 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.6949
+2025-12-18 14:02:35.689 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 14:27:45.262 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: fox, level: beginner
+2025-12-18 14:27:45.266 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: fox, level: beginner
+2025-12-18 14:27:45.274 | ERROR    | src.services.articleFetcher:fetch_articles:23 - Failed to fetch search results: HTTPSConnectionPool(host='html.duckduckgo.com', port=443): Max retries exceeded with url: /html/?q=educational%20articles%20about%20fox%20for%20beginner%20learners (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001D1B566C770>: Failed to resolve 'html.duckduckgo.com' ([Errno 11001] getaddrinfo failed)"))
+2025-12-18 14:27:45.276 | WARNING  | src.services.articlePipeline:run_article_pipeline:13 - No articles fetched.
+2025-12-18 14:29:11.065 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: football, level: beginner
+2025-12-18 14:29:11.065 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: football, level: beginner
+2025-12-18 14:29:11.069 | ERROR    | src.services.articleFetcher:fetch_articles:23 - Failed to fetch search results: HTTPSConnectionPool(host='html.duckduckgo.com', port=443): Max retries exceeded with url: /html/?q=educational%20articles%20about%20football%20for%20beginner%20learners (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001D1B5692DE0>: Failed to resolve 'html.duckduckgo.com' ([Errno 11001] getaddrinfo failed)"))
+2025-12-18 14:29:11.070 | WARNING  | src.services.articlePipeline:run_article_pipeline:13 - No articles fetched.
+2025-12-18 14:29:49.582 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: cricket, level: beginner
+2025-12-18 14:29:49.583 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: cricket, level: beginner
+2025-12-18 14:29:49.584 | ERROR    | src.services.articleFetcher:fetch_articles:23 - Failed to fetch search results: HTTPSConnectionPool(host='html.duckduckgo.com', port=443): Max retries exceeded with url: /html/?q=educational%20articles%20about%20cricket%20for%20beginner%20learners (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001D1B55F64E0>: Failed to resolve 'html.duckduckgo.com' ([Errno 11001] getaddrinfo failed)"))
+2025-12-18 14:29:49.586 | WARNING  | src.services.articlePipeline:run_article_pipeline:13 - No articles fetched.
+2025-12-18 14:31:44.364 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: fox, level: beginner
+2025-12-18 14:31:44.365 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: fox, level: beginner
+2025-12-18 14:31:46.159 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 14:31:46.162 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 14:31:46.725 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.5828
+2025-12-18 14:31:46.727 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 14:33:37.481 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: bat, level: beginner
+2025-12-18 14:33:37.488 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: bat, level: beginner
+2025-12-18 14:33:39.810 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 14:33:39.812 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 14:33:40.154 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.6416
+2025-12-18 14:33:40.154 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 14:35:38.066 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: bat, level: beginner
+2025-12-18 14:35:38.068 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: bat, level: beginner
+2025-12-18 14:35:39.451 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 14:35:39.453 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 14:35:39.653 | INFO     | src.services.articleFilter:filter_articles:35 - Top article score: 0.6416
+2025-12-18 14:35:39.654 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 15:23:32.894 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: mercury, level: beginner, context: planet
+2025-12-18 15:23:32.901 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: mercury, level: beginner, context: planet
+2025-12-18 15:23:34.899 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 15:23:34.901 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 15:23:35.363 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7351
+2025-12-18 15:23:35.363 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-18 15:26:39.102 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: mercury, level: beginner, context: element
+2025-12-18 15:26:39.112 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: mercury, level: beginner, context: element
+2025-12-18 15:26:40.479 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-18 15:26:40.493 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-18 15:26:41.048 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7751
+2025-12-18 15:26:41.049 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 14:36:19.229 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: DSA, level: advanced, context: 
+2025-12-19 14:36:19.233 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: DSA, level: advanced, context: 
+2025-12-19 14:36:20.611 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 14:36:20.612 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 14:36:21.047 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6401
+2025-12-19 14:36:21.047 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 14:45:02.361 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: quantum computing, level: advanced, context: 
+2025-12-19 14:45:02.364 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: quantum computing, level: advanced, context: 
+2025-12-19 14:45:03.890 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 14:45:03.893 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 14:45:04.616 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7539
+2025-12-19 14:45:04.617 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 15:00:44.521 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: quantum entaglement, level: advanced, context: CSE
+2025-12-19 15:00:44.525 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: quantum entaglement, level: advanced, context: CSE
+2025-12-19 15:00:46.482 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 15:00:46.486 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 15:00:47.069 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.5069
+2025-12-19 15:00:47.069 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 15:24:40.881 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Super Computers, level: advanced, context: CSE
+2025-12-19 15:24:40.882 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Super Computers, level: advanced, context: CSE
+2025-12-19 15:24:42.669 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 15:24:42.672 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 15:24:43.197 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6256
+2025-12-19 15:24:43.199 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 15:28:24.429 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Artificial Intelligence, level: advanced, context: CSE
+2025-12-19 15:28:24.433 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Artificial Intelligence, level: advanced, context: CSE
+2025-12-19 15:28:25.877 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 15:28:25.880 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 15:28:26.442 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6023
+2025-12-19 15:28:26.444 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 15:32:44.313 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: blockchain, level: advanced, context: CSE
+2025-12-19 15:32:44.317 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: blockchain, level: advanced, context: CSE
+2025-12-19 15:32:45.561 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 15:32:45.566 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 15:32:46.123 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6865
+2025-12-19 15:32:46.124 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-19 15:37:52.237 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: blockchain, level: advanced, context: CSE
+2025-12-19 15:37:52.241 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: blockchain, level: advanced, context: CSE
+2025-12-19 15:37:53.697 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-19 15:37:53.701 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-19 15:37:54.264 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6865
+2025-12-19 15:37:54.265 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 13:52:34.688 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: pattern recognition, level: advanced, context: CSE
+2025-12-20 13:52:34.692 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: pattern recognition, level: advanced, context: CSE
+2025-12-20 13:52:36.713 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 13:52:36.715 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 13:52:37.136 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6689
+2025-12-20 13:52:37.137 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 13:52:58.431 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:19 - [PDF] Searching DuckDuckGo for: https://html.duckduckgo.com/html/?q=pattern%20recognition%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk
+2025-12-20 13:52:59.765 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:36 - [PDF] Found 8 raw PDF-ish links
+2025-12-20 13:52:59.797 | ERROR    | src.services.paperService:fetch_papers_from_duckduckgo:57 - [PDF] Failed to process //duckduckgo.com/l/?uddg=https%3A%2F%2Fdoc.lagout.org%2Fscience%2FArtificial%2520Intelligence%2FMachine%2520learning%2FIntroduction%2520to%2520Pattern%2520Recognition%2520and%2520Machine%2520Learning%2520%255BMurty%2520%2526%2520Devi%25202014%2D09%2D30%255D.pdf&rut=f0869b3720b54476183cae768ec2a91702b51870500472211679ef8602e83ec5: Invalid URL '//duckduckgo.com/l/?uddg=https%3A%2F%2Fdoc.lagout.org%2Fscience%2FArtificial%2520Intelligence%2FMachine%2520learning%2FIntroduction%2520to%2520Pattern%2520Recognition%2520and%2520Machine%2520Learning%2520%255BMurty%2520%2526%2520Devi%25202014%2D09%2D30%255D.pdf&rut=f0869b3720b54476183cae768ec2a91702b51870500472211679ef8602e83ec5': No scheme supplied. Perhaps you meant https:////duckduckgo.com/l/?uddg=https%3A%2F%2Fdoc.lagout.org%2Fscience%2FArtificial%2520Intelligence%2FMachine%2520learning%2FIntroduction%2520to%2520Pattern%2520Recognition%2520and%2520Machine%2520Learning%2520%255BMurty%2520%2526%2520Devi%25202014%2D09%2D30%255D.pdf&rut=f0869b3720b54476183cae768ec2a91702b51870500472211679ef8602e83ec5?
+2025-12-20 13:52:59.798 | ERROR    | src.services.paperService:fetch_papers_from_duckduckgo:57 - [PDF] Failed to process //duckduckgo.com/l/?uddg=http%3A%2F%2Farticle.sapub.org%2Fpdf%2F10.5923.j.computer.20110102.06.pdf&rut=a993bc67d4e4271a0a20e0a38ce31edfcb8e629619baaa4c88aca86471805841: Invalid URL '//duckduckgo.com/l/?uddg=http%3A%2F%2Farticle.sapub.org%2Fpdf%2F10.5923.j.computer.20110102.06.pdf&rut=a993bc67d4e4271a0a20e0a38ce31edfcb8e629619baaa4c88aca86471805841': No scheme supplied. Perhaps you meant https:////duckduckgo.com/l/?uddg=http%3A%2F%2Farticle.sapub.org%2Fpdf%2F10.5923.j.computer.20110102.06.pdf&rut=a993bc67d4e4271a0a20e0a38ce31edfcb8e629619baaa4c88aca86471805841?
+2025-12-20 13:52:59.799 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:60 - [PDF] 0 PDFs passed relevance scoring
+2025-12-20 13:58:01.437 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Deep Learning, level: advanced, context: CSE
+2025-12-20 13:58:01.440 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Deep Learning, level: advanced, context: CSE
+2025-12-20 13:58:03.038 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 13:58:03.039 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 13:58:03.438 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7067
+2025-12-20 13:58:03.438 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 13:58:29.939 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:27 - [PDF] Searching DuckDuckGo for: https://html.duckduckgo.com/html/?q=Deep%20Learning%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk
+2025-12-20 13:58:31.089 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:46 - [PDF] Found 4 raw PDF-ish links
+2025-12-20 13:58:32.629 | INFO     | src.services.paperService:fetch_papers_from_duckduckgo:70 - [PDF] 0 PDFs passed relevance scoring
+2025-12-20 14:13:25.143 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: operating systems, level: advanced, context: CSE
+2025-12-20 14:13:25.146 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: operating systems, level: advanced, context: CSE
+2025-12-20 14:13:26.455 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 14:13:26.456 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 14:13:26.870 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7606
+2025-12-20 14:13:26.871 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 14:14:00.801 | INFO     | src.services.paperPipeline.run_paper_pipeline:run_paper_pipeline:6 - 📚 Running paper pipeline for: operating systems
+2025-12-20 14:14:00.802 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 1: https://html.duckduckgo.com/html/?q=operating%20systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=0
+2025-12-20 14:14:01.828 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 2: https://html.duckduckgo.com/html/?q=operating%20systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=30
+2025-12-20 14:14:02.832 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:43 - [PDF] Collected 10 unique PDF links
+2025-12-20 14:21:12.214 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: operating systems, level: advanced, context: CSE
+2025-12-20 14:21:12.216 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: operating systems, level: advanced, context: CSE
+2025-12-20 14:21:13.444 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 14:21:13.446 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 14:21:13.860 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.7123
+2025-12-20 14:21:13.860 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 14:21:42.121 | INFO     | src.services.paperPipeline.run_paper_pipeline:run_paper_pipeline:6 - 📚 Running paper pipeline for: operating systems
+2025-12-20 14:21:42.122 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 1: https://html.duckduckgo.com/html/?q=operating%20systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=0
+2025-12-20 14:21:43.316 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 2: https://html.duckduckgo.com/html/?q=operating%20systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=30
+2025-12-20 14:21:44.613 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:43 - [PDF] Collected 11 unique PDF links
+2025-12-20 14:44:15.240 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Database Management, level: advanced, context: CSE
+2025-12-20 14:44:15.247 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Database Management, level: advanced, context: CSE
+2025-12-20 14:44:16.952 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 14:44:16.955 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 14:44:17.474 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6554
+2025-12-20 14:44:17.475 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 14:44:46.128 | INFO     | src.services.paperPipeline.run_paper_pipeline:run_paper_pipeline:6 - 📚 Running paper pipeline for: Database Management
+2025-12-20 14:44:46.144 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 1: https://html.duckduckgo.com/html/?q=Database%20Management%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=0
+2025-12-20 14:44:47.269 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 2: https://html.duckduckgo.com/html/?q=Database%20Management%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=30
+2025-12-20 14:44:48.296 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 3: https://html.duckduckgo.com/html/?q=Database%20Management%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=60
+2025-12-20 14:44:48.648 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:43 - [PDF] Collected 2 unique PDF links
+2025-12-20 14:54:20.173 | INFO     | src.services.articlePipeline:run_article_pipeline:8 - Running article pipeline for topic: Embedded Systems, level: advanced, context: CSE
+2025-12-20 14:54:20.180 | INFO     | src.services.articleFetcher:fetch_articles:17 - Fetching articles for topic: Embedded Systems, level: advanced, context: CSE
+2025-12-20 14:54:21.405 | INFO     | src.services.articleFetcher:fetch_articles:42 - Fetched 10 raw articles
+2025-12-20 14:54:21.407 | INFO     | src.services.articleFilter:filter_articles:12 - Filtering 10 articles for topic relevance...
+2025-12-20 14:54:21.832 | INFO     | src.services.articleFilter:filter_articles:36 - Top article score: 0.6797
+2025-12-20 14:54:21.833 | INFO     | src.utils.summarizerUtils:summarize_articles:9 - Summarizing 5 articles...
+2025-12-20 14:54:47.185 | INFO     | src.services.paperPipeline.run_paper_pipeline:run_paper_pipeline:6 - 📚 Running paper pipeline for: Embedded Systems
+2025-12-20 14:54:47.193 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 1: https://html.duckduckgo.com/html/?q=Embedded%20Systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=0
+2025-12-20 14:54:48.764 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:24 - [PDF] Searching DuckDuckGo page 2: https://html.duckduckgo.com/html/?q=Embedded%20Systems%20CSE%20review%20paper%20filetype%3Apdf%20site%3A.edu%20OR%20site%3A.org%20OR%20site%3A.ac.uk&s=30
+2025-12-20 14:54:50.232 | INFO     | src.services.paperPipeline.fetchDuckDuckGo:fetch_pdf_links:43 - [PDF] Collected 10 unique PDF links

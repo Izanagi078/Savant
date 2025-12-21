@@ -1,23 +1,16 @@
-import io
-from PyPDF2 import PdfReader
-from bs4 import BeautifulSoup
+import fitz  # PyMuPDF
 import requests
+from io import BytesIO
 
-def parse_pdf(file_bytes: bytes) -> str:
-    reader = PdfReader(io.BytesIO(file_bytes))
-    texts = []
-    for page in reader.pages:
-        try:
-            texts.append(page.extract_text() or "")
-        except Exception:
-            texts.append("")
-    return "\n".join(texts)
+def extract_text_from_pdf(url: str) -> str:
+    response = requests.get(url, timeout=10)
+    if response.status_code != 200:
+        return ""
 
-def parse_web(url: str) -> str:
-    resp = requests.get(url, timeout=20)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "lxml")
-    for tag in soup(["script", "style", "noscript"]):
-        tag.decompose()
-    text = soup.get_text(separator=" ").strip()
-    return " ".join(text.split())
+    with fitz.open(stream=BytesIO(response.content), filetype="pdf") as doc:
+        text = ""
+        for page in doc:
+            text += page.get_text()
+            if len(text) > 2000:
+                break
+        return text.strip()

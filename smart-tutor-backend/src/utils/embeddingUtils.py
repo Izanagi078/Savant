@@ -1,15 +1,10 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
-_embeddings = None
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def get_embeddings(model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
-    global _embeddings
-    if _embeddings is None:
-        _embeddings = HuggingFaceEmbeddings(model_name=model_name)
-    return _embeddings
+def get_embedding(text: str) -> np.ndarray:
+    return model.encode(text, convert_to_numpy=True)
 
-def embed_texts(texts: list[str]) -> list[list[float]]:
-    return get_embeddings().embed_documents(texts)
-
-def embed_query(text: str) -> list[float]:
-    return get_embeddings().embed_query(text)
+def cosine_similarity(vec1: np.ndarray, vec2: np.ndarray) -> float:
+    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))

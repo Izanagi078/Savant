@@ -5,6 +5,7 @@ class ContentIngestRequest(BaseModel):
     user_id: str
     topic: str
     level: Optional[str] = "beginner"
+    context: Optional[str] = ""
 
 class ContentIngestResponse(BaseModel):
     status: str

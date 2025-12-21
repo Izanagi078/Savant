@@ -1,90 +1,58 @@
-import json
-import asyncio
-from uuid import uuid4
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
-from datetime import datetime
 import logging
-
 from src.services.videoService import search_youtube
-from src.services.paperService import search_arxiv
-from src.services.resourceService import search_articles
+from src.services.articlePipeline import run_article_pipeline
 from src.services.redisService import save_content
+from src.services.paperPipeline.run_paper_pipeline import run_paper_pipeline  # ✅ Updated import
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-KAFKA_BOOTSTRAP_SERVERS = "localhost:9092"
-INPUT_TOPIC = "user_prompt"
-OUTPUT_TOPIC = "raw_content_fetched"
+async def run_content_aggregator_direct(data: dict):
+    topic = data.get("topic")
+    level = data.get("level")
+    context = data.get("context", "")
+    request_id = data.get("request_id")
 
-async def run_content_aggregator():
-    consumer = AIOKafkaConsumer(
-        INPUT_TOPIC,
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        group_id="content-aggregator-group",
-        value_deserializer=lambda m: json.loads(m.decode("utf-8"))
-    )
-    producer = AIOKafkaProducer(
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        value_serializer=lambda m: json.dumps(m).encode("utf-8")
-    )
+    if not request_id:
+        logger.warning(f"⚠️ Missing request_id in message: {data}")
+        return
 
-    await consumer.start()
-    await producer.start()
-    logger.info(f"🟢 Content Aggregator is running and listening on '{INPUT_TOPIC}'...")
+    if not level:
+        logger.info(f"ℹ️ No level provided — defaulting to 'beginner'")
+        level = "beginner"
+
+    logger.info(f"📥 Processing content aggregation for: {topic} | Level: {level} | Request ID: {request_id}")
 
     try:
-        async for msg in consumer:
-            data = msg.value
-            topic = data.get("topic")
-            level = data.get("level", "beginner")
-            request_id = data.get("request_id")
+        # Fetch YouTube videos
+        videos = await search_youtube(topic, level, context)
 
-            if not request_id:
-                logger.warning(f"⚠️ Missing request_id in message: {data}")
-                continue
+        # Fetch and filter articles using ML pipeline
+        articles = run_article_pipeline(topic, level, context)
+        for article in articles:
+            article["source"] = "Web"
 
-            logger.info(f"📥 Received: {data}")
+        # Fetch academic papers (only for advanced level)
+        papers = []
+        if level.lower() == "advanced":
+            logger.info(f"📚 Fetching academic papers for: {topic}")
+            paper_links = run_paper_pipeline(topic, context)  # ✅ Now sync
+            logger.info(f"📄 Found {len(paper_links)} PDF links")
+            papers = [{"title": link.split('/')[-1], "url": link, "source": "PDF"} for link in paper_links]
 
-            try:
-                videos = await search_youtube(topic, level)
-                papers = await search_arxiv(topic, level)
-                articles = await search_articles(topic, level)
+        # Combine all content
+        all_content = videos + articles + papers
 
-                logger.info(f"🎥 Found {len(videos)} videos")
-                logger.info(f"📄 Found {len(papers)} papers")
-                logger.info(f"📚 Found {len(articles)} articles")
+        # Save to Redis
+        await save_content(request_id, {
+            "topic": topic,
+            "context": context,
+            "videos": videos,
+            "resources": articles + papers,
+            "results": all_content
+        })
 
-                all_content = videos + papers + articles
+        logger.info(f"✅ Successfully saved content for request_id: {request_id}")
 
-                await save_content(request_id, all_content)
-                logger.info(f"💾 Saved content to Redis for request_id: {request_id}")
-
-                for item in all_content:
-                    payload = {
-                        "request_id": request_id,
-                        "source": item["source"],
-                        "title": item["title"],
-                        "description": item["description"],
-                        "url": item["url"],
-                        "timestamp": datetime.utcnow().isoformat()
-                    }
-
-                    await producer.send_and_wait(
-                        topic=OUTPUT_TOPIC,
-                        key=str(uuid4()).encode("utf-8"),
-                        value=payload
-                    )
-
-                logger.info(f"✅ Published {len(all_content)} items for topic: {topic}")
-
-            except Exception as e:
-                logger.error(f"❌ Error processing topic '{topic}': {e}")
-
-    finally:
-        await consumer.stop()
-        await producer.stop()
-        logger.info("🛑 Content Aggregator stopped.")
-if __name__ == "__main__":
-    asyncio.run(run_content_aggregator())
-
+    except Exception as e:
+        logger.error(f"❌ Error processing topic '{topic}' (request_id: {request_id}): {e}")

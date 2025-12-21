@@ -21,21 +21,19 @@ async def ingest_content(payload: ContentIngestRequest):
 
 @router.get("/status/{request_id}", response_model=ContentIngestResponse)
 async def get_content_status(request_id: str):
-    results = await get_content(request_id)
-    if not results:
+    data = await get_content(request_id)
+    if not data or "results" not in data:
         raise HTTPException(status_code=404, detail="No content found")
 
-    topic = "unknown"
-    for item in results:
-        if "title" in item and item["title"]:
-            topic = item["title"].split()[0]
-            break
+    topic = data.get("topic", "unknown")
+    results = data["results"]
 
     return ContentIngestResponse(
         status="completed",
         topic=topic,
         request_id=request_id,
         videos=[r for r in results if r.get("source") == "YouTube"],
-        papers=[r for r in results if r.get("source") == "arXiv"],
+        papers=[r for r in results if r.get("source") == "PDF"], 
         resources=[r for r in results if r.get("source") == "Web"]
     )
+
