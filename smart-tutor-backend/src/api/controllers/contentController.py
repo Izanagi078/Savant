@@ -1,41 +1,74 @@
+import asyncio
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException
 from src.models.content import ContentIngestRequest, ContentIngestResponse
-from src.services.contentService import queue_content_request
-from src.services.redisService import get_content
+from src.services.llmService import generate_syllabus
+from src.services.videoService import search_youtube
+from src.services.paperService import search_arxiv
+from src.services.resourceService import search_articles
 
 router = APIRouter()
 
-@router.post("/ingest", response_model=ContentIngestResponse)
-async def ingest_content(payload: ContentIngestRequest):
+# Shared in-memory store for session course cache (accessible by chatbot tutor)
+course_store = {}
+
+from src.services.verifierAgent import verify_and_map_resources
+
+@router.post("/generate", response_model=ContentIngestResponse)
+async def generate_course(payload: ContentIngestRequest):
     request_id = str(uuid4())
-    await queue_content_request(payload, request_id)
-    return ContentIngestResponse(
-        status="queued",
-        topic=payload.topic,
-        request_id=request_id,
-        videos=[],
-        papers=[],
-        resources=[]
-    )
+    topic = payload.topic
+    level = payload.level or "beginner"
 
-@router.get("/status/{request_id}", response_model=ContentIngestResponse)
-async def get_content_status(request_id: str):
-    results = await get_content(request_id)
-    if not results:
-        raise HTTPException(status_code=404, detail="No content found")
+    try:
+        # Stage 1: Generate syllabus with queries
+        syllabus = await generate_syllabus(topic, level)
+        if not syllabus or "modules" not in syllabus:
+            raise ValueError("Syllabus generation returned empty or malformed data.")
 
-    topic = "unknown"
-    for item in results:
-        if "title" in item and item["title"]:
-            topic = item["title"].split()[0]
-            break
+        # Stage 2: Fetch resources per module concurrently
+        async def fetch_resources_for_module(module):
+            queries = module.get("search_queries", {})
+            yt_query = queries.get("youtube", f"{level} {module.get('title')} youtube")
+            arxiv_query = queries.get("arxiv", f"{level} {module.get('title')} paper")
+            wiki_query = queries.get("wikipedia", f"{level} {module.get('title')}")
 
-    return ContentIngestResponse(
-        status="completed",
-        topic=topic,
-        request_id=request_id,
-        videos=[r for r in results if r.get("source") == "YouTube"],
-        papers=[r for r in results if r.get("source") == "arXiv"],
-        resources=[r for r in results if r.get("source") == "Web"]
-    )
+            yt_res, arxiv_res, wiki_res = await asyncio.gather(
+                search_youtube(yt_query, ""),
+                search_arxiv(arxiv_query, ""),
+                search_articles(wiki_query, "")
+            )
+
+            module["raw_resources"] = {
+                "youtube": yt_res,
+                "arxiv": arxiv_res,
+                "wikipedia": wiki_res
+            }
+
+        await asyncio.gather(*(fetch_resources_for_module(mod) for mod in syllabus.get("modules", [])))
+
+        # Stage 3: Verifier Agent to filter and map resources
+        verified_syllabus = await verify_and_map_resources(syllabus, level)
+
+        # Cache the course data in memory for tutor lookup
+        flat_content = []
+        for mod in verified_syllabus.get("modules", []):
+            for res in mod.get("resources", []):
+                flat_content.append(res)
+
+        course_store[request_id] = {
+            "syllabus": verified_syllabus,
+            "content": flat_content
+        }
+
+        return ContentIngestResponse(
+            status="completed",
+            topic=topic,
+            request_id=request_id,
+            syllabus=verified_syllabus
+        )
+    except Exception as e:
+        import traceback
+        import logging
+        logging.getLogger(__name__).error(f"Generation failed: {str(e)}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")

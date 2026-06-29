@@ -4,7 +4,7 @@ import "../styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Smart Tutor",
-  description: "AI-Powered Course Builder",
+  description: "Personalized Course Builder and Tutor",
 };
 
 export default function RootLayout({
@@ -13,12 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="flex h-screen">
+    <html lang="en" suppressHydrationWarning>
+      <body className="flex h-screen bg-[#070913] text-zinc-100 antialiased overflow-hidden" suppressHydrationWarning>
         {/* Sidebar fills full height */}
         <Sidebar />
         {/* Main content area shifts right */}
-        <main className="flex-1 bg-gray-50 p-6 overflow-y-auto">
+        <main className="flex-1 bg-[#0A0C16] p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800">
           {children}
         </main>
       </body>

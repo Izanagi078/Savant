@@ -10,6 +10,6 @@ class ContentIngestResponse(BaseModel):
     status: str
     topic: str
     request_id: str
-    videos: List[dict]
-    papers: List[dict]
-    resources: List[dict]
+    syllabus: dict
+
+
