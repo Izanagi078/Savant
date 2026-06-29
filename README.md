@@ -1,25 +1,34 @@
-# 🚀 SmartTutor: AI-Powered Course Builder
+# 🚀 SmartTutor: Course Builder & Personal Tutor
 
-An event-driven, RAG-enabled tutoring application that automatically constructs dynamic courses, syndicates academic papers, pulls video lectures, and creates interactive quizzes from simple topic prompts.
+A lightweight, synchronous agentic course compiler that automatically constructs structured learning syllabi, retrieves targeted reference videos and papers, filters them using a Verifier Agent, and hosts an interactive expert tutoring chat dashboard.
 
 ---
 
 ## 📐 System Architecture
 
-SmartTutor is architected as an asynchronous, distributed event-driven application using a microservices-inspired Python backend and a modern Next.js frontend:
+SmartTutor uses a simplified, high-performance synchronous agentic pipeline that eliminates container overhead (no Docker, Kafka, Redis, or local vector DB indexing required):
 
 ```mermaid
 graph TD
-    Client[Next.js Frontend] -->|1. Submit Ingestion Route| API[FastAPI Gateway]
-    API -->|2. Emit user_prompt| Kafka[Apache Kafka]
-    Kafka -->|3. Consume Prompt| Aggregator[Content Aggregator Worker]
-    Aggregator -->|4a. Search API| YT[YouTube Data Client]
-    Aggregator -->|4b. Query API| arXiv[arXiv Search Client]
-    Aggregator -->|4c. Fetch Web| Web[Web Crawler Client]
-    Aggregator -->|5. Save Results| Redis[(Redis Cache)]
-    Aggregator -->|6. Index Context| FAISS[(FAISS Vector DB)]
-    API -->|7. Poll Status| Redis
-    Client -->|8. Fetch Syllabus & Quizzes| API
+    Client[Next.js Frontend] -->|1. POST /content/generate| API[FastAPI Gateway]
+    API -->|2. Generate Syllabus & Queries| Gemini[Gemini 1.5 Flash]
+    
+    API -->|3a. Search query| YT[YouTube XML Feed]
+    API -->|3b. Search query| arXiv[arXiv API]
+    API -->|3c. Search query| Wiki[Wikipedia OpenSearch]
+    
+    YT -.->|Raw Results| API
+    arXiv -.->|Raw Results| API
+    Wiki -.->|Raw Results| API
+    
+    API -->|4. Audit & Filter Resources| Verifier[Verifier Agent - Groq Llama 3.1]
+    Verifier -->|5. Return Verified Course JSON| API
+    API -->|6. Cache Session Course| Store[In-Memory Store]
+    API -->|7. Return Complete Verified Syllabus| Client
+    
+    Client -->|8. Chat Tutor Prompt| API
+    API -->|9. Lookup Syllabus Context| Store
+    API -->|10. In-Context RAG Response| Groq[Groq Llama 3.1 / Gemini]
 ```
 
 ---
@@ -28,17 +37,16 @@ graph TD
 
 * **Frontend:** Next.js, React, TypeScript, Chart.js, TailwindCSS.
 * **API Gateway:** FastAPI (Python), Pydantic.
-* **Message Broker:** Apache Kafka (asynchronous event ingestion and pipeline processing).
-* **Caching & State:** Redis (in-memory request caching and status tracking).
-* **Embeddings & Vector Search:** LangChain, SentenceTransformers (`all-MiniLM-L6-v2`), FAISS (Facebook AI Similarity Search).
-* **Scraping & Ingestion:** BeautifulSoup4, aiohttp, PyPDF2, pdfplumber.
+* **LLM Engine:** Gemini 1.5 Flash (syllabus query compilation) & Groq Llama 3.1 8B (verifier agent and chat tutor).
+* **RAG Strategy:** Memory-safe in-context context stuffing (no heavy FAISS vector files on disk).
+* **Scraping & Ingestion:** BeautifulSoup4, aiohttp, requests.
 
 ---
 
 ## 📂 Repository Structure
 
 ```text
-AI-Powered-Course-Builder/
+smart-tutor-workspace/
 ├── smart-tutor/               # Next.js React Frontend App
 │   ├── public/                # Static assets & media
 │   ├── src/
@@ -49,17 +57,14 @@ AI-Powered-Course-Builder/
 │   └── tsconfig.json
 │
 └── smart-tutor-backend/       # FastAPI Python Backend App
-    ├── data/                  # Vector Store Index storage
     ├── docs/                  # Architecture schemas & notes
     ├── src/
     │   ├── api/               # API Controllers & routes
     │   ├── config/            # System configuration settings
     │   ├── models/            # Pydantic validation schemas
-    │   ├── services/          # LLM orchestration, Kafka, VectorDB, Redis services
-    │   └── utils/             # Helper utilities (embeddings, parsing)
+    │   ├── services/          # LLM orchestration, Verifier Agent, search services
+    │   └── utils/             # Helper utilities
     ├── tests/                 # Backend testing harness
-    ├── consumer.py            # Local Kafka event consumer demo
-    ├── docker-compose.yml     # Local services container orchestration (Kafka, Redis)
     └── requirements.txt       # Python backend dependencies
 ```
 
@@ -67,30 +72,25 @@ AI-Powered-Course-Builder/
 
 ## 🛠️ Installation & Setup
 
-### 1. Spin up Core Infrastructure Services
-Launch Redis and Apache Kafka local containers:
-```bash
-cd smart-tutor-backend
-docker-compose up -d
+### 1. Configure API Keys
+Create a `.env` file inside `smart-tutor-backend` containing your credentials:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 ### 2. Configure the Python Backend
-Create a virtual environment and install the required machine learning and web dependencies:
+Activate your local virtual environment and install dependencies:
 ```bash
 cd smart-tutor-backend
-python -m venv .venv
-source .venv/Scripts/activate  # On Windows
+# Activate your environment
+source Scripts/activate  # Windows PowerShell/Cmd
 pip install -r requirements.txt
 ```
 
 Launch the FastAPI web server:
 ```bash
-uvicorn src.main:app --reload --port 8000
-```
-
-Run the background content aggregator:
-```bash
-python -m src.services.contentAggregator
+python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
 ```
 
 ### 3. Run the Frontend App
@@ -100,4 +100,5 @@ cd smart-tutor
 npm install
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to access the visual learning client.
+
+Open [http://localhost:3000](http://localhost:3000) to access the learning client.
