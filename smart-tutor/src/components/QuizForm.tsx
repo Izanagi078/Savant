@@ -4,6 +4,7 @@ export interface Question {
   id: number;
   text: string;
   options: string[];
+  explanation?: string;
 }
 
 interface QuizFormProps {

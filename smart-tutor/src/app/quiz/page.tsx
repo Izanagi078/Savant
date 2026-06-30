@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import QuizForm, { Question } from "@/components/QuizForm";
 
 interface GradingResult {
@@ -15,9 +16,18 @@ interface GradingResult {
 }
 
 export default function QuizPage() {
+  const router = useRouter();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth");
+    }
+  }, [router]);
+
   const [topic, setTopic] = useState("");
+  const [level, setLevel] = useState("Beginner");
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [correctAnswers, setCorrectAnswers] = useState<Record<number, number>>({});
@@ -34,15 +44,20 @@ export default function QuizPage() {
     setQuestions([]);
     setCorrectAnswers({});
     setGradingResult(null);
-    setStatusText("Invoking Groq API for sub-second quiz generation...");
+    setStatusText(`Invoking Quiz Verifier Agent for verified ${level} quiz...`);
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           topic: topic.trim(),
-          count: 4,
+          count: 10,
+          level: level,
         }),
       });
 
@@ -57,6 +72,7 @@ export default function QuizPage() {
             id: q.id,
             text: q.text,
             options: q.options,
+            explanation: q.explanation,
           });
           answersMap[q.id] = q.answer;
         });
@@ -76,10 +92,15 @@ export default function QuizPage() {
   const handleQuizSubmit = async (answers: Record<number, number>) => {
     setLoadingGrading(true);
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/quiz/submit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
+          topic: topic,
           answers: answers,
           correct_answers: correctAnswers,
         }),
@@ -118,6 +139,15 @@ export default function QuizPage() {
             placeholder="e.g. Docker Volumes, Quantum Superposition, React Hooks life-cycle..."
             className="flex-1 px-4 py-3.5 bg-zinc-950/60 border border-zinc-800 focus:border-cyan-500/50 rounded-xl outline-none text-zinc-100 placeholder-zinc-500 focus:ring-2 focus:ring-cyan-500/10 transition duration-200 text-sm"
           />
+          <select
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+            className="px-4 py-3.5 bg-zinc-950/60 border border-zinc-800 focus:border-cyan-500/50 rounded-xl outline-none text-zinc-300 focus:ring-2 focus:ring-cyan-500/10 transition duration-200 text-sm"
+          >
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
           <button
             type="submit"
             disabled={loading || !topic.trim()}
@@ -203,6 +233,12 @@ export default function QuizPage() {
                         <span>Correct answer:</span>
                         <span className="text-green-450 font-bold">{q.options[res.correct_answer]}</span>
                       </p>
+                    )}
+                    {q.explanation && (
+                      <div className="mt-4 p-4 rounded-lg bg-zinc-950/40 border border-zinc-800/60 space-y-1">
+                        <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block text-cyan-400">Explanation:</span>
+                        <p className="text-sm text-zinc-350 leading-relaxed whitespace-pre-line">{q.explanation}</p>
+                      </div>
                     )}
                   </div>
                 </div>

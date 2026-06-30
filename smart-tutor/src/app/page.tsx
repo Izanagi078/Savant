@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface Resource {
   source: string;
@@ -23,7 +24,15 @@ interface Syllabus {
 }
 
 export default function WorkspacePage() {
+  const router = useRouter();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth");
+    }
+  }, [router]);
 
   const [topic, setTopic] = useState("");
   const [level, setLevel] = useState("beginner");
@@ -51,9 +60,13 @@ export default function WorkspacePage() {
     setStatusText("Generating syllabus, fetching target materials, and running Verifier Agent...");
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/content/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           user_id: "user_12345",
           topic: topic.trim(),
@@ -86,9 +99,13 @@ export default function WorkspacePage() {
     setChatLoading(true);
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/tutor/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           query: userMessage,
           request_id: currentRequestId,
@@ -111,13 +128,27 @@ export default function WorkspacePage() {
   return (
     <div className="max-w-6xl mx-auto space-y-10">
       {/* Workspace Header */}
-      <div className="space-y-3">
-        <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-          Course Builder
-        </h1>
-        <p className="text-zinc-400 max-w-2xl text-base leading-relaxed">
-          Provide a learning goal. The orchestrator will build a custom syllabus, retrieve targeted learning materials, and activate your personal expert chat tutor.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="space-y-3">
+          <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            Course Builder
+          </h1>
+          <p className="text-zinc-400 max-w-2xl text-base leading-relaxed">
+            Provide a learning goal. The orchestrator will build a custom syllabus, retrieve targeted learning materials, and activate your personal expert chat tutor.
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user");
+              router.push("/auth");
+            }}
+            className="px-5 py-2.5 bg-zinc-950/60 border border-zinc-800 hover:border-red-500/30 hover:bg-red-500/5 text-zinc-300 hover:text-red-400 text-xs font-bold rounded-xl transition duration-200 cursor-pointer"
+          >
+            Sign Out
+          </button>
+        </div>
       </div>
 
       {/* Creation form (Glass card) */}
