@@ -25,14 +25,37 @@ async def generate_syllabus(topic: str, level: str = "beginner") -> dict:
         logger.warning("⚠️ GEMINI_API_KEY is not set. Using local mock generator fallback.")
         return get_mock_syllabus(topic, level)
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     
     prompt = (
         f"You are an expert tutor. Design a comprehensive course syllabus about '{topic}' for a '{level}' level student. "
         "Break the course down into a structured path of 3 to 4 learning modules. "
         "Provide clear, educational titles, descriptions, and a list of key concepts for each module. "
         f"Additionally, output three highly targeted, simple search queries for each module to retrieve supplementary materials suitable for a '{level}' level student: "
-        "one query specifically for YouTube video guides, one for arXiv research papers/abstracts, and one for Wikipedia pages."
+        "one query specifically for YouTube video guides, one for arXiv research papers/abstracts, and one for Wikipedia pages.\n\n"
+        "Crucial Search Query Guidelines:\n"
+        "- Do NOT include noise words like 'youtube', 'arxiv', 'wikipedia', 'video', 'paper', 'article', 'tutorial', 'beginner', 'intermediate', 'advanced' in the search queries.\n"
+        "- Keep the queries focused on the core concept name. For example, if the module is about 'Introduction to Derivatives', the search queries should simply be:\n"
+        "  * youtube: 'derivatives introduction'\n"
+        "  * arxiv: 'calculus derivatives'\n"
+        "  * wikipedia: 'derivative'\n\n"
+        "Example of structured response format:\n"
+        "{\n"
+        '  "title": "Introduction to Calculus",\n'
+        '  "description": "A beginner course on limits, derivatives, and basic integration.",\n'
+        '  "modules": [\n'
+        "    {\n"
+        '      "title": "Limits and Continuity",\n'
+        '      "description": "Understanding the foundational limit concept in calculus.",\n'
+        '      "key_concepts": ["Limit Definition", "One-Sided Limits", "Continuity"],\n'
+        '      "search_queries": {\n'
+        '        "youtube": "calculus limits introduction",\n'
+        '        "arxiv": "calculus limits",\n'
+        '        "wikipedia": "limit of a function"\n'
+        "      }\n"
+        "    }\n"
+        "  ]\n"
+        "}"
     )
 
     payload = {

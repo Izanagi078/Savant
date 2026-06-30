@@ -20,9 +20,9 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
         "For each resource, evaluate its relevance to the module concepts and its suitability for the student's difficulty level.\n\n"
         "Guidelines for verification:\n"
         f"- Target Level is '{level}'.\n"
-        "- If a resource (especially from arXiv) contains highly advanced formulas, deep technical jargon, or complex papers inappropriate for the level, FILTER IT OUT.\n"
-        "- If a video or page is irrelevant to the module's key concepts, FILTER IT OUT.\n"
-        "- Only retain high-quality resources that directly aid in learning the module's core concepts at the specified level.\n"
+        "- If a resource is completely irrelevant to the module's key concepts, filter it out.\n"
+        "- Evaluate resources for the student's target level. If a resource (especially from arXiv) contains highly advanced formulas or complex jargon that is completely inappropriate for the level, favor introductory, educational, or survey papers, but try to retain at least one relevant research paper reference if available rather than leaving the module empty of academic resources.\n"
+        "- Only retain high-quality resources that directly aid in learning the module's core concepts.\n"
         "- Do not make up resources or URLs. Only choose from the provided candidates.\n"
         "- Return the updated course structure in JSON format matching the schema below."
     )
@@ -58,12 +58,12 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
     # Attempt to query Groq first
     if GROQ_API_KEY:
         try:
-            logger.info("Querying Groq Llama 3.1 for resource verification...")
+            logger.info("Querying Groq Llama 3.3 for resource verification...")
             response = await query_groq(
                 messages=[{"role": "user", "content": prompt}],
                 system_prompt=system_prompt,
                 json_mode=True,
-                model="llama-3.1-8b-instant"
+                model="llama-3.3-70b-versatile"
             )
             if "error" not in response:
                 return response
@@ -74,8 +74,8 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
     # Fallback to Gemini
     if GEMINI_API_KEY:
         try:
-            logger.info("Querying Gemini 1.5 Flash for resource verification (fallback)...")
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            logger.info("Querying Gemini 2.5 Flash for resource verification (fallback)...")
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
             
             payload = {
                 "contents": [

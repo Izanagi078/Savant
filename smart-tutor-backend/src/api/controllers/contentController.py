@@ -9,13 +9,23 @@ from src.services.resourceService import search_articles
 
 router = APIRouter()
 
-# Shared in-memory store for session course cache (accessible by chatbot tutor)
+# Shared in-memory store for session course cache (kept for backward compatibility only)
 course_store = {}
 
 from src.services.verifierAgent import verify_and_map_resources
+from src.services.authService import get_current_user
+from src.models.user import User
+from src.models.course import Course
+from src.config.dbConfig import get_db
+from sqlalchemy.orm import Session
+from fastapi import Depends
 
 @router.post("/generate", response_model=ContentIngestResponse)
-async def generate_course(payload: ContentIngestRequest):
+async def generate_course(
+    payload: ContentIngestRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     request_id = str(uuid4())
     topic = payload.topic
     level = payload.level or "beginner"
@@ -50,12 +60,22 @@ async def generate_course(payload: ContentIngestRequest):
         # Stage 3: Verifier Agent to filter and map resources
         verified_syllabus = await verify_and_map_resources(syllabus, level)
 
-        # Cache the course data in memory for tutor lookup
+        # Persist Course to PostgreSQL/SQLite database
+        new_course = Course(
+            id=request_id,
+            user_id=current_user.id,
+            topic=topic,
+            level=level,
+            syllabus=verified_syllabus
+        )
+        db.add(new_course)
+        db.commit()
+
+        # Cache in memory too just in case of any backward compatibility fallback
         flat_content = []
         for mod in verified_syllabus.get("modules", []):
             for res in mod.get("resources", []):
                 flat_content.append(res)
-
         course_store[request_id] = {
             "syllabus": verified_syllabus,
             "content": flat_content

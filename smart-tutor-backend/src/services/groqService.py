@@ -21,7 +21,7 @@ load_env()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-async def query_groq(messages: list, system_prompt: str = None, json_mode: bool = False, model: str = "llama-3.1-8b-instant") -> dict:
+async def query_groq(messages: list, system_prompt: str = None, json_mode: bool = False, model: str = "llama-3.3-70b-versatile") -> dict:
     if not GROQ_API_KEY:
         logger.warning("⚠️ GROQ_API_KEY is not set. Cannot hit Groq API.")
         return {"error": "GROQ_API_KEY not configured"}
@@ -40,7 +40,8 @@ async def query_groq(messages: list, system_prompt: str = None, json_mode: bool 
     payload = {
         "model": model,
         "messages": formatted_messages,
-        "temperature": 0.2
+        "temperature": 0.2,
+        "max_tokens": 4096
     }
 
     if json_mode:

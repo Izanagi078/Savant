@@ -1,9 +1,12 @@
 import aiohttp
 from bs4 import BeautifulSoup
+from src.services.videoService import clean_search_query
 
 async def search_arxiv(topic: str, level: str) -> list:
-    query = f"{level} {topic}"
-    url = f"http://export.arxiv.org/api/query?search_query=all:{query.replace(' ', '+')}&max_results=3"
+    cleaned = clean_search_query(topic)
+    if not cleaned:
+        cleaned = topic
+    url = f"http://export.arxiv.org/api/query?search_query=all:{cleaned.replace(' ', '+')}&max_results=3"
 
     async with aiohttp.ClientSession() as session:
         try:
