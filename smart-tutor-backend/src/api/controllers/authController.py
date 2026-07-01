@@ -119,8 +119,8 @@ async def signup(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in HTTPS production
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=3600 * 24,  # 24 hours
         path="/"
     )
@@ -150,8 +150,8 @@ async def login(
         key="access_token",
         value=access_token,
         httponly=True,
-        secure=False,  # Set to True in HTTPS production
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=3600 * 24,  # 24 hours
         path="/"
     )
