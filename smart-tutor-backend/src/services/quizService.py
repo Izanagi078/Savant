@@ -2,8 +2,7 @@ import os
 import json
 import logging
 import aiohttp
-from src.services.groqService import query_groq, GROQ_API_KEY
-from src.services.llmService import GEMINI_API_KEY
+from src.services.llmService import query_groq, GROQ_API_KEY, GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
 

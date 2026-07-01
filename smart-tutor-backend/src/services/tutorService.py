@@ -5,8 +5,7 @@ import aiohttp
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm.attributes import flag_modified
-from src.services.groqService import query_groq, GROQ_API_KEY
-from src.services.llmService import GEMINI_API_KEY
+from src.services.llmService import query_groq, GROQ_API_KEY, GEMINI_API_KEY
 from src.models.course import Course
 from src.models.chat import ChatSession
 
