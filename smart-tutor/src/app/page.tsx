@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCourseStore } from "@/store/useStore";
 
 interface Resource {
   source: string;
@@ -27,48 +28,64 @@ export default function WorkspacePage() {
   const router = useRouter();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/auth");
-    }
-  }, [router]);
+  // Zustand State Store
+  const {
+    currentRequestId,
+    setCurrentRequestId,
+    topic,
+    setTopic,
+    level,
+    setLevel,
+    syllabus,
+    setSyllabus,
+    activeModuleIndex,
+    setActiveModuleIndex,
+    chatHistory,
+    setChatHistory,
+    addChatMessage,
+    resetCourse
+  } = useCourseStore();
 
-  const [topic, setTopic] = useState("");
-  const [level, setLevel] = useState("beginner");
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState("");
   
-  const [syllabus, setSyllabus] = useState<Syllabus | null>(null);
-  const [activeModuleIndex, setActiveModuleIndex] = useState<number | null>(0);
-
-  // Chat Tutor States
+  // Chat Tutor component states (transient UI only)
   const [chatInput, setChatInput] = useState("");
-  const [chatHistory, setChatHistory] = useState<{ role: string; text: string }[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
-  const [currentRequestId, setCurrentRequestId] = useState("");
+
+  useEffect(() => {
+    const verifyUser = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
+          credentials: "include"
+        });
+        if (!res.ok) {
+          router.push("/auth");
+        }
+      } catch (err) {
+        router.push("/auth");
+      }
+    };
+    verifyUser();
+  }, [router, API_BASE_URL]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!topic.trim()) return;
 
     setLoading(true);
-    setSyllabus(null);
-    setChatHistory([]);
-    setCurrentRequestId("");
+    resetCourse();
     
     setStatusText("Generating syllabus, fetching target materials, and running Verifier Agent...");
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/content/generate`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
-          user_id: "user_12345",
           topic: topic.trim(),
           level: level,
         }),
@@ -95,17 +112,16 @@ export default function WorkspacePage() {
 
     const userMessage = chatInput.trim();
     setChatInput("");
-    setChatHistory((prev) => [...prev, { role: "user", text: userMessage }]);
+    addChatMessage({ role: "user", text: userMessage });
     setChatLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/tutor/chat`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           query: userMessage,
           request_id: currentRequestId,
@@ -114,12 +130,12 @@ export default function WorkspacePage() {
 
       if (res.ok) {
         const data = await res.json();
-        setChatHistory((prev) => [...prev, { role: "tutor", text: data.response }]);
+        addChatMessage({ role: "tutor", text: data.response });
       } else {
-        setChatHistory((prev) => [...prev, { role: "tutor", text: "Sorry, I ran into an issue connecting to the tutor brain." }]);
+        addChatMessage({ role: "tutor", text: "Sorry, I ran into an issue connecting to the tutor brain." });
       }
     } catch (err) {
-      setChatHistory((prev) => [...prev, { role: "tutor", text: "Failed to send message. Check your connection." }]);
+      addChatMessage({ role: "tutor", text: "Failed to send message. Check your connection." });
     } finally {
       setChatLoading(false);
     }
@@ -136,18 +152,6 @@ export default function WorkspacePage() {
           <p className="text-zinc-400 max-w-2xl text-base leading-relaxed">
             Provide a learning goal. The orchestrator will build a custom syllabus, retrieve targeted learning materials, and activate your personal expert chat tutor.
           </p>
-        </div>
-        <div>
-          <button
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("user");
-              router.push("/auth");
-            }}
-            className="px-5 py-2.5 bg-zinc-950/60 border border-zinc-800 hover:border-red-500/30 hover:bg-red-500/5 text-zinc-300 hover:text-red-400 text-xs font-bold rounded-xl transition duration-200 cursor-pointer"
-          >
-            Sign Out
-          </button>
         </div>
       </div>
 
@@ -315,7 +319,7 @@ export default function WorkspacePage() {
           <div className="space-y-8">
             <div className="bg-gradient-to-b from-[#13172e] to-[#0e1122] border border-cyan-500/20 rounded-2xl p-6 shadow-xl space-y-4">
               <h4 className="font-extrabold flex items-center gap-2 text-sm text-cyan-300 tracking-wider">
-                🎓 SMARTTUTOR EXPERT ASSISTANT
+                🎓 SAVANT EXPERT ASSISTANT
               </h4>
               
               <div className="h-96 overflow-y-auto space-y-3 text-xs bg-black/40 rounded-xl p-4 border border-zinc-800/40 scrollbar-thin scrollbar-thumb-zinc-800">
@@ -336,7 +340,7 @@ export default function WorkspacePage() {
                       }`}
                     >
                       <span className="font-extrabold uppercase tracking-widest text-3xs text-zinc-500 block mb-1">
-                        {chat.role === "user" ? "Student" : "SmartTutor"}
+                        {chat.role === "user" ? "Student" : "Savant"}
                       </span>
                       {chat.text}
                     </div>

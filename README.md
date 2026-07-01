@@ -1,39 +1,45 @@
-# 🚀 SmartTutor: Course Builder & Personal Tutor
+# 🚀 Savant: AI-Powered Course Builder & Interactive Tutor Suite
 
-A lightweight, synchronous agentic course compiler that automatically constructs structured learning syllabi, retrieves targeted reference videos and papers, filters them using a Verifier Agent, and hosts an interactive expert tutoring chat dashboard.
+Savant is a production-grade, highly concurrent generative learning platform that compiles customized, structured course syllabi, retrieves targeted video and paper references, filters them through a verification agent, and hosts an interactive tutoring dashboard featuring dynamically graded quizzes and chat support.
 
 ---
 
 ## 📐 System Architecture
 
-SmartTutor uses a simplified, high-performance synchronous agentic pipeline that eliminates container overhead (no Docker, Kafka, Redis, or local vector DB indexing required):
+Savant is built as a fully decoupled client-server architecture. It features server-side edge routing and asynchronous database processing:
 
 ```mermaid
 graph TD
-    Client[Next.js Frontend] -->|POST /generate| API[FastAPI Gateway]
+    Client[Next.js Frontend] -->|HTTP Requests with Credentials| Middleware[Edge Middleware]
+    Middleware -->|Verified Cookie Check| Gateway[FastAPI Backend Gateway]
 
-    subgraph Stage 1 - Syllabus
-        API -->|Generate| Gemini[Gemini 1.5 Flash]
+    subgraph User & Session State
+        Gateway -->|Async engine| PostgreSQL[(Supabase Cloud PostgreSQL)]
     end
 
-    subgraph Stage 2 - Resource Fetch
-        API --> YT[YouTube]
-        API --> Arxiv[arXiv]
-        API --> Wiki[Wikipedia]
+    subgraph Stage 1 - Syllabus Generation
+        Gateway -->|Generate| Gemini[Gemini 1.5 Flash]
     end
 
-    subgraph Stage 3 - Verification
-        API -->|Raw Results| Verifier[Verifier Agent]
-        Verifier -->|Verified JSON| API
+    subgraph Stage 2 - Resource Concurrency
+        Gateway -->|Fetch| YT[YouTube API]
+        Gateway -->|Fetch| Arxiv[arXiv API]
+        Gateway -->|Fetch| Wiki[Wikipedia Web Scraper]
     end
 
-    API -->|Cache| Store[(Session Store)]
-    API -->|Verified Syllabus| Client
+    subgraph Stage 3 - Verification Agent
+        Gateway -->|Raw Results| Verifier[Verifier Agent]
+        Verifier -->|Syllabus & Map| Gateway
+    end
 
-    subgraph Expert Tutor
-        Client -->|Chat Query| API
-        API -->|Context Lookup| Store
-        API -->|Response| Groq[Groq Llama 3.1]
+    Gateway -->|Save Syllabus & Chat Logs| PostgreSQL
+    Gateway -->|Return Payload| Client
+    Client -->|Local Cache| Zustand[(Zustand State Store)]
+
+    subgraph Interactive Chat Tutor
+        Client -->|Chat Query| Gateway
+        Gateway -->|Retrieve History| PostgreSQL
+        Gateway -->|LLM Context response| Groq[Groq LLaMA 3]
     end
 ```
 
@@ -41,43 +47,46 @@ graph TD
 
 ## ⚡ Core Technology Stack
 
-* **Frontend:** Next.js, React, TypeScript, Chart.js, TailwindCSS.
-* **API Gateway:** FastAPI (Python), Pydantic.
-* **LLM Engine:** Gemini 1.5 Flash (syllabus query compilation) & Groq Llama 3.1 8B (verifier agent and chat tutor).
-* **RAG Strategy:** Memory-safe in-context context stuffing (no heavy FAISS vector files on disk).
-* **Scraping & Ingestion:** BeautifulSoup4, aiohttp, requests.
+* **Frontend App:** Next.js (App Router, Turbopack), React 19, TypeScript, TailwindCSS v4, Chart.js, Zustand.
+* **API Gateway:** FastAPI (Python), Uvicorn.
+* **Database & Transactions:** Cloud PostgreSQL (Supabase) via SQLAlchemy + `asyncpg` (Asynchronous driver with `aiosqlite` local fallback).
+* **Router Protection:** Next.js Server-Side Middleware for HttpOnly cookie checks.
+* **LLM Engine:** Gemini 2.5 Flash (syllabus query compilation) & Groq LLaMA 3 (verifier agent and chat tutor).
+* **Scraping & Integration:** BeautifulSoup4, aiohttp, httpx.
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Installation & Local Setup
 
-### 1. Configure API Keys
+### 1. Configure Environment Variables
 Create a `.env` file inside `smart-tutor-backend` containing your credentials:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
+DATABASE_URL=postgresql://username:password@your-supabase-host:5432/postgres
+JWT_SECRET_KEY=your_secure_secret_key_here
 ```
 
-### 2. Configure the Python Backend
-Activate your local virtual environment and install dependencies:
+### 2. Run the Python Backend
+Install dependencies inside the virtual environment:
 ```bash
 cd smart-tutor-backend
-# Activate your environment
-source Scripts/activate  # Windows PowerShell/Cmd
+# Activate virtual environment
+.\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Launch the FastAPI web server:
+Launch the FastAPI web server with auto-reload:
 ```bash
-python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### 3. Run the Frontend App
-Install Node modules and start the Next.js development server:
+### 3. Run the Frontend Client
+Install the React dependencies and run the Next.js client development server:
 ```bash
 cd smart-tutor
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to access the learning client.
+Open [http://localhost:3000](http://localhost:3000) to access the learning application.

@@ -2,22 +2,27 @@ import os
 import json
 import logging
 import aiohttp
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm.attributes import flag_modified
 from src.services.groqService import query_groq, GROQ_API_KEY
 from src.services.llmService import GEMINI_API_KEY
 from src.models.course import Course
-from src.config.mongoConfig import get_mongo_db
+from src.models.chat import ChatSession
 
 logger = logging.getLogger(__name__)
 
-async def chat_tutor(query: str, request_id: str, user_id: int, db: Session) -> dict:
-    # 1. Retrieve the course syllabus from PostgreSQL
-    course = db.query(Course).filter(Course.id == request_id, Course.user_id == user_id).first()
+async def chat_tutor(query: str, request_id: str, user_id: int, db: AsyncSession) -> dict:
+    # 1. Retrieve the course syllabus from PostgreSQL asynchronously
+    result = await db.execute(
+        select(Course).filter(Course.id == request_id, Course.user_id == user_id)
+    )
+    course = result.scalars().first()
     context = ""
     
     if course:
         syllabus = course.syllabus
-        # We also need to extract flat references for verification
+        # Extract flat references
         content_list = []
         for mod in syllabus.get("modules", []):
             for res in mod.get("resources", []):
@@ -37,28 +42,30 @@ async def chat_tutor(query: str, request_id: str, user_id: int, db: Session) -> 
         context = "No specific course context is available for this request."
 
     system_prompt = (
-        "You are SmartTutor, a helpful and intelligent expert teaching assistant. "
+        "You are Savant, a helpful and intelligent expert teaching assistant. "
         "Your task is to answer the student's question based on the provided Course Context. "
         "Be concise, educational, and reference module concepts or syndicated resources where applicable. "
         f"\n\n--- COURSE CONTEXT ---\n{context}\n----------------------"
     )
 
-    # 2. Retrieve existing chat history from MongoDB
+    # 2. Retrieve existing chat history from PostgreSQL asynchronously
+    chat_doc = None
+    history = []
     try:
-        mongo_db = get_mongo_db()
-        chat_collection = mongo_db["tutor_chat_sessions"]
-        chat_doc = await chat_collection.find_one({"request_id": request_id, "user_id": user_id})
-        history = chat_doc.get("history", []) if chat_doc else []
-    except Exception as me:
-        logger.error(f"Error fetching chat history from MongoDB: {me}")
-        history = []
+        chat_result = await db.execute(
+            select(ChatSession).filter(ChatSession.request_id == request_id, ChatSession.user_id == user_id)
+        )
+        chat_doc = chat_result.scalars().first()
+        if chat_doc:
+            history = chat_doc.history
+    except Exception as e:
+        logger.error(f"Error fetching chat history from PostgreSQL: {e}")
 
     response_text = ""
 
     # 3. Call LLM
     if GROQ_API_KEY:
         logger.info(f"⚡ Tutoring chat using Groq API...")
-        # Map past history into messages array
         messages = []
         for turn in history[-10:]:
             messages.append({
@@ -77,12 +84,11 @@ async def chat_tutor(query: str, request_id: str, user_id: int, db: Session) -> 
         logger.info(f"🧠 Tutoring chat using Gemini API fallback...")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
         
-        # Build prompt string with chat history
         prompt_with_context = f"{system_prompt}\n\n"
         for turn in history[-10:]:
-            role_label = "Student" if turn["role"] == "user" else "SmartTutor"
+            role_label = "Student" if turn["role"] == "user" else "Savant"
             prompt_with_context += f"{role_label}: {turn['text']}\n"
-        prompt_with_context += f"Student: {query}\nSmartTutor:"
+        prompt_with_context += f"Student: {query}\nSavant:"
         
         payload = {
             "contents": [{"parts": [{"text": prompt_with_context}]}]
@@ -99,18 +105,24 @@ async def chat_tutor(query: str, request_id: str, user_id: int, db: Session) -> 
     if not response_text:
         response_text = "I am in offline mode due to an API timeout. Please verify your connection keys."
 
-    # 4. Save the new conversation turns to MongoDB
+    # 4. Save the new conversation turns to PostgreSQL asynchronously
     try:
         new_turns = [
             {"role": "user", "text": query},
             {"role": "tutor", "text": response_text}
         ]
-        await chat_collection.update_one(
-            {"request_id": request_id, "user_id": user_id},
-            {"$push": {"history": {"$each": new_turns}}},
-            upsert=True
-        )
-    except Exception as me:
-        logger.error(f"Error persisting new chat turns to MongoDB: {me}")
+        if chat_doc:
+            chat_doc.history = list(chat_doc.history) + new_turns
+            flag_modified(chat_doc, "history")
+        else:
+            chat_doc = ChatSession(
+                request_id=request_id,
+                user_id=user_id,
+                history=new_turns
+            )
+            db.add(chat_doc)
+        await db.commit()
+    except Exception as e:
+        logger.error(f"Error persisting new chat turns to PostgreSQL: {e}")
 
     return {"response": response_text}

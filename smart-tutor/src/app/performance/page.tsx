@@ -23,19 +23,10 @@ export default function PerformancePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/auth");
-      return;
-    }
-
     async function fetchHistory() {
       try {
-        const token = localStorage.getItem("token");
         const res = await fetch(`${API_BASE_URL}/performance/history`, {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+          credentials: "include"
         });
         if (res.ok) {
           const data = await res.json();

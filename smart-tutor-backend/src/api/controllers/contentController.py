@@ -17,14 +17,14 @@ from src.services.authService import get_current_user
 from src.models.user import User
 from src.models.course import Course
 from src.config.dbConfig import get_db
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
 @router.post("/generate", response_model=ContentIngestResponse)
 async def generate_course(
     payload: ContentIngestRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     request_id = str(uuid4())
     topic = payload.topic
@@ -60,7 +60,7 @@ async def generate_course(
         # Stage 3: Verifier Agent to filter and map resources
         verified_syllabus = await verify_and_map_resources(syllabus, level)
 
-        # Persist Course to PostgreSQL/SQLite database
+        # Persist Course to PostgreSQL/SQLite database asynchronously
         new_course = Course(
             id=request_id,
             user_id=current_user.id,
@@ -69,7 +69,7 @@ async def generate_course(
             syllabus=verified_syllabus
         )
         db.add(new_course)
-        db.commit()
+        await db.commit()
 
         # Cache in memory too just in case of any backward compatibility fallback
         flat_content = []

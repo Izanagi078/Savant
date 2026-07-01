@@ -20,11 +20,20 @@ export default function QuizPage() {
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/auth");
-    }
-  }, [router]);
+    const verifyUser = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/me`, {
+          credentials: "include"
+        });
+        if (!res.ok) {
+          router.push("/auth");
+        }
+      } catch (err) {
+        router.push("/auth");
+      }
+    };
+    verifyUser();
+  }, [router, API_BASE_URL]);
 
   const [topic, setTopic] = useState("");
   const [level, setLevel] = useState("Beginner");
@@ -47,13 +56,12 @@ export default function QuizPage() {
     setStatusText(`Invoking Quiz Verifier Agent for verified ${level} quiz...`);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/quiz/generate`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           topic: topic.trim(),
           count: 10,
@@ -92,13 +100,12 @@ export default function QuizPage() {
   const handleQuizSubmit = async (answers: Record<number, number>) => {
     setLoadingGrading(true);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/quiz/submit`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({
           topic: topic,
           answers: answers,

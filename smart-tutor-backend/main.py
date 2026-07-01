@@ -5,16 +5,23 @@ from src.config.dbConfig import engine, Base
 from src.models.performance import QuizAttempt
 from src.models.user import User
 from src.models.course import Course
+from src.models.chat import ChatSession
 
-# Initialize database tables
-Base.metadata.create_all(bind=engine)
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    print("Connected to PostgreSQL successfully!")
+    yield
 
-# Enable CORS for local client development
+app = FastAPI(lifespan=lifespan)
+
+# Enable CORS with explicit origins for cookie credential transmission
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

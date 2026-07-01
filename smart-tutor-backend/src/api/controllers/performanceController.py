@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from src.config.dbConfig import get_db
 from src.models.performance import QuizAttempt
 from src.models.user import User
@@ -10,10 +11,15 @@ router = APIRouter()
 @router.get("/history")
 async def get_performance_history(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     try:
-        attempts = db.query(QuizAttempt).filter(QuizAttempt.user_id == current_user.id).order_by(QuizAttempt.timestamp.asc()).all()
+        result = await db.execute(
+            select(QuizAttempt)
+            .filter(QuizAttempt.user_id == current_user.id)
+            .order_by(QuizAttempt.timestamp.asc())
+        )
+        attempts = result.scalars().all()
         return [
             {
                 "id": attempt.id,

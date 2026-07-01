@@ -35,7 +35,7 @@ aiohttp==3.9.5
 
 # Database & Security
 sqlalchemy==2.0.35
-psycopg2-binary==2.9.9
-motor==3.6.0
+asyncpg==0.30.0
+aiosqlite==0.20.0
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0

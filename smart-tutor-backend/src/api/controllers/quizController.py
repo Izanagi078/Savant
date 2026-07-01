@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.services.quizService import generate_quiz
 from src.config.dbConfig import get_db
 from src.models.performance import QuizAttempt
@@ -34,7 +34,7 @@ async def get_quiz(
 async def submit_quiz(
     payload: QuizSubmitRequest,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     score = 0
     total = len(payload.correct_answers)
@@ -57,7 +57,7 @@ async def submit_quiz(
     
     percentage = (score / total * 100) if total > 0 else 0.0
     
-    # Save attempt into the database
+    # Save attempt into the database asynchronously
     try:
         attempt = QuizAttempt(
             user_id=current_user.id,
@@ -67,10 +67,9 @@ async def submit_quiz(
             percentage=percentage
         )
         db.add(attempt)
-        db.commit()
-        db.refresh(attempt)
+        await db.commit()
+        await db.refresh(attempt)
     except Exception as e:
-        # Log database error and return results anyway (graceful degradation)
         print(f"Database error writing attempt: {e}")
         
     return {
