@@ -32,7 +32,8 @@ async def search_youtube(topic: str, level: str) -> list:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=3.0)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         try:
             async with session.get(url, headers=headers) as resp:
                 if resp.status != 200:

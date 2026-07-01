@@ -175,19 +175,9 @@ async def verify_quiz_questions(quiz_data: dict, topic: str, level: str) -> dict
         "}"
     )
 
-    if GROQ_API_KEY:
-        try:
-            logger.info("🤖 Querying Groq Llama 3.3 for quiz audit...")
-            messages = [{"role": "user", "content": prompt}]
-            response = await query_groq(messages, system_prompt=system_prompt, json_mode=True, model="llama-3.3-70b-versatile")
-            if "questions" in response:
-                return response
-        except Exception as e:
-            logger.error(f"Groq quiz audit failed: {e}")
-
     if GEMINI_API_KEY:
         try:
-            logger.info("🤖 Querying Gemini fallback for quiz audit...")
+            logger.info("🤖 Querying Gemini for quiz audit...")
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
             payload = {
                 "contents": [{"parts": [{"text": f"{system_prompt}\n\n{prompt}"}]}],
@@ -218,15 +208,28 @@ async def verify_quiz_questions(quiz_data: dict, topic: str, level: str) -> dict
                     }
                 }
             }
-            timeout = aiohttp.ClientTimeout(total=180)
+            timeout = aiohttp.ClientTimeout(total=15.0)
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.post(url, json=payload, headers={"Content-Type": "application/json"}) as resp:
                     if resp.status == 200:
                         res = await resp.json()
                         text = res["candidates"][0]["content"]["parts"][0]["text"]
                         return json.loads(text)
+                    else:
+                        error_text = await resp.text()
+                        logger.error(f"Gemini API returned error {resp.status}: {error_text}. Falling back to Groq.")
         except Exception as e:
-            logger.error(f"Failed to audit quiz using Gemini fallback: {e}")
+            logger.error(f"Failed to audit quiz using Gemini: {e}. Falling back to Groq.")
+
+    if GROQ_API_KEY:
+        try:
+            logger.info("🤖 Querying Groq Llama 3.3 for quiz audit (fallback)...")
+            messages = [{"role": "user", "content": prompt}]
+            response = await query_groq(messages, system_prompt=system_prompt, json_mode=True, model="llama-3.3-70b-versatile")
+            if "questions" in response:
+                return response
+        except Exception as e:
+            logger.error(f"Groq quiz audit failed: {e}")
 
     return quiz_data
 

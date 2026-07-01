@@ -54,26 +54,10 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
         "}"
     )
 
-    # Attempt to query Groq first
-    if GROQ_API_KEY:
-        try:
-            logger.info("Querying Groq Llama 3.3 for resource verification...")
-            response = await query_groq(
-                messages=[{"role": "user", "content": prompt}],
-                system_prompt=system_prompt,
-                json_mode=True,
-                model="llama-3.3-70b-versatile"
-            )
-            if "error" not in response:
-                return response
-            logger.warning(f"Groq verification failed or returned error: {response.get('error')}. Falling back to Gemini.")
-        except Exception as e:
-            logger.error(f"Error querying Groq in verifierAgent: {e}. Falling back to Gemini.")
-
-    # Fallback to Gemini
+    # Attempt to query Gemini first (faster generation, strict schema support)
     if GEMINI_API_KEY:
         try:
-            logger.info("Querying Gemini 2.5 Flash for resource verification (fallback)...")
+            logger.info("Querying Gemini 2.5 Flash for resource verification...")
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
             
             payload = {
@@ -126,7 +110,8 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
                 }
             }
             
-            async with aiohttp.ClientSession() as session:
+            timeout = aiohttp.ClientTimeout(total=15.0)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.post(url, json=payload, headers={"Content-Type": "application/json"}) as resp:
                     if resp.status == 200:
                         result = await resp.json()
@@ -134,9 +119,24 @@ async def verify_and_map_resources(syllabus_with_raw_resources: dict, level: str
                         return json.loads(text_content)
                     else:
                         error_text = await resp.text()
-                        logger.error(f"Gemini API returned error {resp.status}: {error_text}")
+                        logger.error(f"Gemini API returned error {resp.status}: {error_text}. Falling back to Groq.")
         except Exception as e:
-            logger.error(f"Error querying Gemini for verification: {e}")
+            logger.error(f"Error querying Gemini for verification: {e}. Falling back to Groq.")
+
+    # Fallback to Groq if Gemini fails or is not configured
+    if GROQ_API_KEY:
+        try:
+            logger.info("Querying Groq Llama 3.3 for resource verification (fallback)...")
+            response = await query_groq(
+                messages=[{"role": "user", "content": prompt}],
+                system_prompt=system_prompt,
+                json_mode=True,
+                model="llama-3.3-70b-versatile"
+            )
+            if "error" not in response:
+                return response
+        except Exception as e:
+            logger.error(f"Error querying Groq in verifierAgent: {e}")
 
     # Final mock/unverified fallback mapping if both APIs are unavailable or fail
     logger.warning("All LLM APIs failed for verification. Returning raw/unverified fallback mapping.")

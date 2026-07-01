@@ -16,7 +16,8 @@ async def search_articles(topic: str, level: str) -> list:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    async with aiohttp.ClientSession(headers=headers) as session:
+    timeout = aiohttp.ClientTimeout(total=3.0)
+    async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
         # 1. Wikipedia Search
         try:
             wiki_url = f"https://en.wikipedia.org/w/api.php?action=opensearch&search={cleaned.replace(' ', '+')}&limit=3&namespace=0&format=json"
