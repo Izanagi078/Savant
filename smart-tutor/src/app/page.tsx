@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCourseStore } from "@/store/useStore";
+import { getApiBaseUrl } from "@/utils/api";
 
 interface Resource {
   source: string;
@@ -26,7 +27,7 @@ interface Syllabus {
 
 export default function WorkspacePage() {
   const router = useRouter();
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE_URL = getApiBaseUrl();
 
   // Zustand State Store
   const {

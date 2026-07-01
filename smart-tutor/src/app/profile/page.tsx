@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getApiBaseUrl } from "@/utils/api";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE_URL = getApiBaseUrl();
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");

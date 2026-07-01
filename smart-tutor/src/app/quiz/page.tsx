@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import QuizForm, { Question } from "@/components/QuizForm";
+import { getApiBaseUrl } from "@/utils/api";
 
 interface GradingResult {
   score: number;
@@ -17,7 +18,7 @@ interface GradingResult {
 
 export default function QuizPage() {
   const router = useRouter();
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE_URL = getApiBaseUrl();
 
   useEffect(() => {
     const verifyUser = async () => {

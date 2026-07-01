@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getApiBaseUrl } from "@/utils/api";
 
 export default function AuthPage() {
   const router = useRouter();
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE_URL = getApiBaseUrl();
 
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
