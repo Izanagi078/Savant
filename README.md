@@ -18,7 +18,7 @@ graph TD
     end
 
     subgraph Stage 1 - Syllabus Generation
-        Gateway -->|Generate| Gemini[Gemini 1.5 Flash]
+        Gateway -->|Generate| Gemini[Gemini 2.5 Flash]
     end
 
     subgraph Stage 2 - Resource Concurrency
@@ -51,7 +51,7 @@ graph TD
 * **API Gateway:** FastAPI (Python), Uvicorn.
 * **Database & Transactions:** Cloud PostgreSQL (Supabase) via SQLAlchemy + `asyncpg` (Asynchronous driver with `aiosqlite` local fallback).
 * **Router Protection:** Next.js Server-Side Middleware for HttpOnly cookie checks.
-* **LLM Engine:** Gemini 2.5 Flash (syllabus query compilation) & Groq LLaMA 3 (verifier agent and chat tutor).
+* **LLM Engine:** Gemini 2.5 Flash (syllabus query compilation & quiz generation) & Groq LLaMA 3 (verifier agent and chat tutor).
 * **Scraping & Integration:** BeautifulSoup4, aiohttp, httpx.
 
 ---
@@ -65,6 +65,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
 DATABASE_URL=postgresql://username:password@your-supabase-host:5432/postgres
 JWT_SECRET_KEY=your_secure_secret_key_here
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
 ### 2. Run the Python Backend
