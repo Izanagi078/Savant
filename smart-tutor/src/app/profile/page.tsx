@@ -21,8 +21,9 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
+        const token = localStorage.getItem("access_token");
         const res = await fetch(`${API_BASE_URL}/auth/me`, {
-          credentials: "include"
+          headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (!res.ok) {
@@ -70,12 +71,13 @@ export default function ProfilePage() {
         payload.password = password;
       }
 
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${API_BASE_URL}/auth/update`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        credentials: "include",
         body: JSON.stringify(payload)
       });
 

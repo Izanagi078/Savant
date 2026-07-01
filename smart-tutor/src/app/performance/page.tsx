@@ -25,8 +25,9 @@ export default function PerformancePage() {
   useEffect(() => {
     async function fetchHistory() {
       try {
+        const token = localStorage.getItem("access_token");
         const res = await fetch(`${API_BASE_URL}/performance/history`, {
-          credentials: "include"
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
           const data = await res.json();

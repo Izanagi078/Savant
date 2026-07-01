@@ -56,8 +56,10 @@ export default function WorkspacePage() {
   useEffect(() => {
     const verifyUser = async () => {
       try {
+        const token = localStorage.getItem("access_token");
+        if (!token) { router.push("/auth"); return; }
         const res = await fetch(`${API_BASE_URL}/auth/me`, {
-          credentials: "include"
+          headers: { "Authorization": `Bearer ${token}` }
         });
         if (!res.ok) {
           router.push("/auth");
@@ -79,12 +81,13 @@ export default function WorkspacePage() {
     setStatusText("Generating syllabus, fetching target materials, and running Verifier Agent...");
 
     try {
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${API_BASE_URL}/content/generate`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        credentials: "include",
         body: JSON.stringify({
           topic: topic.trim(),
           level: level,
@@ -116,12 +119,13 @@ export default function WorkspacePage() {
     setChatLoading(true);
 
     try {
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${API_BASE_URL}/tutor/chat`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        credentials: "include",
         body: JSON.stringify({
           query: userMessage,
           request_id: currentRequestId,

@@ -32,25 +32,25 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-# Custom dependency to extract token from HttpOnly cookie
-def get_token_from_cookie(request: Request) -> str:
-    token = request.cookies.get("access_token")
-    if not token:
+# Custom dependency to extract token from Authorization header
+def get_token_from_header(request: Request) -> str:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Session token missing. Please authenticate.",
-            headers={"WWW-Authenticate": "Cookie"},
+            headers={"WWW-Authenticate": "Bearer"},
         )
-    return token
+    return auth_header.split(" ", 1)[1]
 
 async def get_current_user(
-    token: str = Depends(get_token_from_cookie),
+    token: str = Depends(get_token_from_header),
     db: AsyncSession = Depends(get_db)
 ) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Cookie"},
+        headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

@@ -23,15 +23,7 @@ export default function Sidebar() {
   ];
 
   const handleLogout = async () => {
-    try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include"
-      });
-    } catch (err) {
-      console.error("Logout request failed:", err);
-    }
+    localStorage.removeItem("access_token");
     localStorage.removeItem("user");
     router.push("/auth");
   };

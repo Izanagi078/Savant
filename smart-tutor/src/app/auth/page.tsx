@@ -59,7 +59,6 @@ export default function AuthPage() {
         const res = await fetch(`${API_BASE_URL}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
           body: JSON.stringify({ email: emailTrim, password }),
         });
 
@@ -69,6 +68,7 @@ export default function AuthPage() {
           throw new Error(data.detail || "Authentication failed. Check your credentials.");
         }
 
+        localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         router.push("/");

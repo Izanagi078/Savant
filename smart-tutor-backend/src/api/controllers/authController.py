@@ -113,18 +113,8 @@ async def signup(
     await db.commit()
     await db.refresh(new_user)
     
-    # Set HttpOnly cookie for automatic login after signup
+    # Return token in body for client-side storage
     access_token = create_access_token(data={"sub": new_user.email})
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=3600 * 24,  # 24 hours
-        path="/"
-    )
-    
     return new_user
 
 @router.post("/login")
@@ -145,18 +135,9 @@ async def login(
         
     access_token = create_access_token(data={"sub": user.email})
     
-    # Issue HTTPOnly cookie
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=3600 * 24,  # 24 hours
-        path="/"
-    )
-    
     return {
+        "access_token": access_token,
+        "token_type": "bearer",
         "user": {
             "id": user.id,
             "email": user.email,
