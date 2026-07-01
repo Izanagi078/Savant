@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 class ContentIngestRequest(BaseModel):
-    user_id: str
+    user_id: Optional[str] = None
     topic: str
     level: Optional[str] = "beginner"
 
