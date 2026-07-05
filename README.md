@@ -2,6 +2,10 @@
 
 Savant is a production-grade, highly concurrent generative learning platform that compiles customized, structured course syllabi, retrieves targeted video and paper references, filters them through a verification agent, and hosts an interactive tutoring dashboard featuring dynamically graded quizzes and chat support.
 
+### 🌐 Live Deployment
+- **Frontend App:** [https://savant.vercel.app](https://savant.vercel.app)
+- **Backend API Gateway:** [https://savant-oqtv.onrender.com](https://savant-oqtv.onrender.com) (API Docs: [https://savant-oqtv.onrender.com/docs](https://savant-oqtv.onrender.com/docs))
+
 ---
 
 ## 📐 System Architecture
@@ -91,3 +95,29 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to access the learning application.
+
+---
+
+## 🌐 Cloud Deployment & Configuration
+
+The application is deployed and configured for production use:
+
+### 1. Frontend (Vercel)
+The Next.js frontend is deployed on Vercel.
+* **Live Deployment:** [https://savant.vercel.app](https://savant.vercel.app)
+* **Environment Variables:**
+  * `NEXT_PUBLIC_API_URL`: The live backend API gateway URL (`https://savant-oqtv.onrender.com`). If not set, the frontend fallback logic automatically uses this production URL.
+
+### 2. Backend (Render)
+The FastAPI backend is deployed on Render.
+* **Live API Endpoint:** [https://savant-oqtv.onrender.com](https://savant-oqtv.onrender.com)
+* **Interactive API Documentation:** [https://savant-oqtv.onrender.com/docs](https://savant-oqtv.onrender.com/docs)
+* **Deployment Details:**
+  * **Build Command:** `pip install -r requirements.txt`
+  * **Start Command:** `python -m uvicorn main:app --host 0.0.0.0 --port $PORT`
+  * **Environment Variables Required:**
+    * `GEMINI_API_KEY`: Google Gemini API Key for syllabus compilation and quiz generation.
+    * `GROQ_API_KEY`: Groq API Key for agentic content verification and tutoring chat.
+    * `DATABASE_URL`: Supabase Cloud PostgreSQL connection string (handles table creation dynamically on lifespan startup).
+    * `JWT_SECRET_KEY`: Private signing key for authorization tokens.
+    * `ALLOWED_ORIGINS`: Production frontend origin (`https://savant.vercel.app`) to handle cross-origin request credentials.
