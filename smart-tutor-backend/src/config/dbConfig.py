@@ -1,4 +1,5 @@
 import os
+import re
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -8,11 +9,23 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./smart_tutor.db")
 # Helper to format connection strings for asyncpg/aiosqlite
 def get_async_db_url(url: str) -> str:
     if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
     elif url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
     elif url.startswith("sqlite:///"):
         return url.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
+    
+    # Translate sslmode to ssl for asyncpg compatibility
+    if "sslmode=" in url:
+        url = url.replace("sslmode=require", "ssl=require")
+        url = url.replace("sslmode=disable", "ssl=disable")
+        url = url.replace("sslmode=prefer", "ssl=prefer")
+        url = url.replace("sslmode=allow", "ssl=allow")
+    
+    # Strip channel_binding since asyncpg doesn't support it
+    if "channel_binding=" in url:
+        url = re.sub(r'[&?]channel_binding=[^&]+', '', url)
+        
     return url
 
 ASYNC_DATABASE_URL = get_async_db_url(DATABASE_URL)
